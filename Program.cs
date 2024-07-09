@@ -99,6 +99,8 @@ namespace DeckCard
 
             Deck deck = new Deck(cards);
 
+            deck.Shuffle();
+
             return deck;
         }
 
@@ -146,7 +148,6 @@ namespace DeckCard
         {
             List<Card> transmissionList = new List<Card>();
 
-
             for (int i = 0; i < numberOfCards; i++)
             {
                 int lastIndex = _cards.Count - 1;
@@ -157,6 +158,25 @@ namespace DeckCard
             }
 
             return transmissionList;
+        }
+
+        public void Shuffle()
+        {
+            Random random = new Random();
+
+            int minLimitRandom = 0;
+            int maxLimitRandom = _cards.Count;
+
+            Card tempElement;
+
+            for (int i = 0; i < _cards.Count; i++)
+            {
+                int indexRandom = random.Next(minLimitRandom, maxLimitRandom);
+
+                tempElement = _cards[i];
+                _cards[i] = _cards[indexRandom];
+                _cards[indexRandom] = tempElement;
+            }
         }
     }
 

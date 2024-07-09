@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
-using System.Data;
 
 namespace DeckCard
 {
@@ -24,13 +21,11 @@ namespace DeckCard
         {
             Console.WriteLine("Вы сели за игральный стол.");
 
-            Deck tempDeck = _croupier.ReturnRemoveDeck(ReadNumberCards());
-
-            _player.TakeDeck(tempDeck);
+            _player.TakeCards(_croupier.GiveCards(ReadNumberCards()));
 
             Console.WriteLine("У вас в руках:");
 
-            _player.ShowDeckPlayer();
+            _player.ShowCardsPlayer();
         }
 
         private int ReadNumberCards()
@@ -60,11 +55,16 @@ namespace DeckCard
 
     class Croupier
     {
-        private static Deck _deckCroupier = new Deck();
+        private Deck _deck = new Deck();
 
         public Croupier()
         {
             CreateCroupierDeck();
+        }
+
+        private void CreateCroupierDeck()
+        {
+            _deck = CreateRandomDeck();
         }
 
         private Deck CreateRandomDeck()
@@ -85,69 +85,42 @@ namespace DeckCard
                 }
             }
 
-            ShuffleCards(cards);
-
             Deck deck = new Deck();
             deck.AddCards(cards);
 
             return deck;
         }
 
-        private void CreateCroupierDeck()
+        public List<Card> GiveCards(int numberOfCards)
         {
-            _deckCroupier = CreateRandomDeck();
+            List<Card> giveCards = new List<Card> ();
+            giveCards = CreateTransmissionList(numberOfCards);
+            return giveCards;
         }
 
-        static void ShuffleCards(List<Card> cards)
+        private List<Card> CreateTransmissionList(int numberOfCards)
         {
-            Shuffle(cards);
-        }
-
-        static void Shuffle(List<Card> cards)
-        {
-            Random random = new Random();
-
-            int minLimitRandom = 0;
-            int maxLimitRandom = cards.Count;
-
-            Card tempElement;
-
-            for (int i = 0; i < cards.Count; i++)
-            {
-                int indexRandom = random.Next(minLimitRandom, maxLimitRandom);
-
-                tempElement = cards[i];
-                cards[i] = cards[indexRandom];
-                cards[indexRandom] = tempElement;
-            }
-        }
-
-        public Deck ReturnRemoveDeck(int numberOfCards)
-        {
-            Deck removeDeck = new Deck();
-
-            return removeDeck.ReturnRemoveCards(_deckCroupier, numberOfCards);
+            return _deck.CreateTransmissionList(numberOfCards);
         }
     }
 
     class Player
     {
-        private Deck _deckPlayer = new Deck();
+        private List<Card> _cards = new List<Card>();
 
-        public void ShowDeckPlayer()
+        public void ShowCardsPlayer()
         {
-            _deckPlayer.ShowCards();
+            foreach (var element in _cards)
+            {
+                element.ShowCard();
+            }
+
+            Console.WriteLine();
         }
 
         public void TakeCards(List<Card> cards)
         {
-            for (int i = 0; i < cards.Count; i++)
-                _deckPlayer.AddCard(cards[i]);
-        }
-
-        public void TakeDeck(Deck deck)
-        {
-            _deckPlayer = deck;
+            _cards.AddRange(cards);
         }
     }
 
@@ -160,28 +133,23 @@ namespace DeckCard
             _cards = cards;
         }
 
-        public Deck ReturnRemoveCards(Deck deck, int numberOfCards)
+        public List<Card> CreateTransmissionList(int numberOfCards)
         {
-            Deck removeDeck = new Deck();
+            List<Card> transmissionList = new List<Card>();
 
             for (int i = 0; i < numberOfCards; i++)
             {
-                Card removeCard = deck.ReturnRemoveCard(deck._cards[i]);
-                removeDeck.AddCard(removeCard);
+                Card removeCard = _cards[i];
+                _cards.Remove(_cards[i]);
+                transmissionList.Add(removeCard);
             }
 
-            return removeDeck;
+            return transmissionList;
         }
 
-        public void AddCard(Card card)
+        private void AddCard(Card card)
         {
             _cards.Add(card);
-        }
-
-        public Card ReturnRemoveCard(Card card)
-        {
-            _cards.Remove(card);
-            return card;
         }
 
         public void ShowCards()

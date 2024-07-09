@@ -112,7 +112,7 @@ namespace DeckCard
         {
             foreach (var element in _cards)
             {
-                element.ShowCard();
+                element.ShowStats();
             }
 
             Console.WriteLine();
@@ -166,17 +166,17 @@ namespace DeckCard
     class Card
     {
         private string _suit;
-        private string _nameOfCard;
+        private string _name;
 
-        public Card(string suit, string nameOfCard)
+        public Card(string suit, string name)
         {
             _suit = suit;
-            _nameOfCard = nameOfCard;
+            _name = name;
         }
 
-        public void ShowCard()
+        public void ShowStats()
         {
-            Console.WriteLine($"У вас в руках: {_suit}{_nameOfCard}");
+            Console.WriteLine($"У вас в руках: {_suit}{_name}");
         }
     }
 }

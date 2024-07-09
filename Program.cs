@@ -21,17 +21,43 @@ namespace DeckCard
         {
             Console.WriteLine("Вы сели за игральный стол.");
 
-            _player.TakeCards(_croupier.GiveCards(ReadNumberCards()));
+            _croupier.Work(_player);
+
+            Console.WriteLine("Игра закончилась.");
+        }
+    }
+
+    class Croupier
+    {
+        private Deck _deck;
+
+        public Croupier()
+        {
+            _deck = CreateDeck();
+        }
+
+        public int Size => _deck.Size;
+
+        public void Work(Player player)
+        {
+            player.TryTakeCards(GiveList(ReadNumberCards()));
 
             Console.WriteLine("Вы взяли следующие карты:");
 
-            _player.ShowCards();
+            player.ShowCards();
+        }
+
+        public List<Card> GiveList(int numberOfCards)
+        {
+            List<Card> cards;
+            cards = CreateTransmissionList(numberOfCards);
+            return cards;
         }
 
         private int ReadNumberCards()
         {
             int numberCards;
-            int deckSize = _croupier.ReturnDeckSize();
+            int deckSize = Size;
 
             do
             {
@@ -52,23 +78,8 @@ namespace DeckCard
 
             return value;
         }
-    }
 
-    class Croupier
-    {
-        private Deck _deck;
-
-        public Croupier()
-        {
-            _deck = CreateRandomDeck();
-        }
-
-        public int ReturnDeckSize()
-        {
-            return _deck.ReturnListSize();
-        }
-
-        private Deck CreateRandomDeck()
+        private Deck CreateDeck()
         {
             string[] suits = { "Spades", "Hearts", "Tiles", "Clover" };
             string[] nameOfCards = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" };
@@ -91,13 +102,6 @@ namespace DeckCard
             return deck;
         }
 
-        public List<Card> GiveCards(int numberOfCards)
-        {
-            List<Card> giveCards = new List<Card>();
-            giveCards = CreateTransmissionList(numberOfCards);
-            return giveCards;
-        }
-
         private List<Card> CreateTransmissionList(int numberOfCards)
         {
             return _deck.CreateTransmissionList(numberOfCards);
@@ -118,9 +122,12 @@ namespace DeckCard
             Console.WriteLine();
         }
 
-        public void TakeCards(List<Card> cards)
+        public void TryTakeCards(List<Card> cards)
         {
-            _cards.AddRange(cards);
+            if (cards.Count == 0)
+                Console.WriteLine("Карт нет.");
+            else
+                _cards.AddRange(cards);
         }
     }
 
@@ -133,10 +140,7 @@ namespace DeckCard
             _cards = cards;
         }
 
-        public int ReturnListSize()
-        {
-            return _cards.Count;
-        }
+        public int Size => _cards.Count;
 
         public List<Card> CreateTransmissionList(int numberOfCards)
         {
@@ -147,16 +151,9 @@ namespace DeckCard
             {
                 int lastIndex = _cards.Count - 1;
 
-                if (_cards[lastIndex] == null)
-                {
-                    i--;
-                }
-                else
-                {
-                    Card card = _cards[lastIndex];
-                    _cards.Remove(_cards[lastIndex]);
-                    transmissionList.Add(card);
-                }
+                Card card = _cards[lastIndex];
+                _cards.Remove(_cards[lastIndex]);
+                transmissionList.Add(card);
             }
 
             return transmissionList;

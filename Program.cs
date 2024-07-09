@@ -23,21 +23,22 @@ namespace DeckCard
 
             _player.TakeCards(_croupier.GiveCards(ReadNumberCards()));
 
-            Console.WriteLine("У вас в руках:");
+            Console.WriteLine("Вы взяли следующие карты:");
 
-            _player.ShowCardsPlayer();
+            _player.ShowCards();
         }
 
         private int ReadNumberCards()
         {
             int numberCards;
+            int deckSize = _croupier.ReturnDeckSize();
 
             do
             {
-                Console.WriteLine("Сколько карт вы хотите получить?");
+                Console.WriteLine($"Сколько карт вы хотите получить, введите число до {deckSize}?");
                 numberCards = ReadInt();
             }
-            while (numberCards <= 0);
+            while (numberCards <= 0 || numberCards > deckSize);
 
             return numberCards;
         }
@@ -55,16 +56,16 @@ namespace DeckCard
 
     class Croupier
     {
-        private Deck _deck = new Deck();
+        private Deck _deck;
 
         public Croupier()
         {
-            CreateCroupierDeck();
+            _deck = CreateRandomDeck();
         }
 
-        private void CreateCroupierDeck()
+        public int ReturnDeckSize()
         {
-            _deck = CreateRandomDeck();
+            return _deck.ReturnListSize();
         }
 
         private Deck CreateRandomDeck()
@@ -85,15 +86,14 @@ namespace DeckCard
                 }
             }
 
-            Deck deck = new Deck();
-            deck.AddCards(cards);
+            Deck deck = new Deck(cards);
 
             return deck;
         }
 
         public List<Card> GiveCards(int numberOfCards)
         {
-            List<Card> giveCards = new List<Card> ();
+            List<Card> giveCards = new List<Card>();
             giveCards = CreateTransmissionList(numberOfCards);
             return giveCards;
         }
@@ -108,7 +108,7 @@ namespace DeckCard
     {
         private List<Card> _cards = new List<Card>();
 
-        public void ShowCardsPlayer()
+        public void ShowCards()
         {
             foreach (var element in _cards)
             {
@@ -128,28 +128,38 @@ namespace DeckCard
     {
         private List<Card> _cards = new List<Card>();
 
-        public void AddCards(List<Card> cards)
+        public Deck(List<Card> cards)
         {
             _cards = cards;
+        }
+
+        public int ReturnListSize()
+        {
+            return _cards.Count;
         }
 
         public List<Card> CreateTransmissionList(int numberOfCards)
         {
             List<Card> transmissionList = new List<Card>();
 
+
             for (int i = 0; i < numberOfCards; i++)
             {
-                Card removeCard = _cards[i];
-                _cards.Remove(_cards[i]);
-                transmissionList.Add(removeCard);
+                int lastIndex = _cards.Count - 1;
+
+                if (_cards[lastIndex] == null)
+                {
+                    i--;
+                }
+                else
+                {
+                    Card card = _cards[lastIndex];
+                    _cards.Remove(_cards[lastIndex]);
+                    transmissionList.Add(card);
+                }
             }
 
             return transmissionList;
-        }
-
-        private void AddCard(Card card)
-        {
-            _cards.Add(card);
         }
     }
 

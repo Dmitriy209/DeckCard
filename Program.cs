@@ -151,16 +151,6 @@ namespace DeckCard
         {
             _cards.Add(card);
         }
-
-        public void ShowCards()
-        {
-            foreach (var element in _cards)
-            {
-                element.ShowCard();
-            }
-
-            Console.WriteLine();
-        }
     }
 
     class Card
